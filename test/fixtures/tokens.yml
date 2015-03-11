@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  token: MyText
+  created_by: MyText
+  ost_session_id: MyText
+
+two:
+  token: MyText
+  created_by: MyText
+  ost_session_id: MyText

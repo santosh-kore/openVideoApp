@@ -1,0 +1,103 @@
+<script type="text/javascript">
+    $(document).ready(function() {
+        var SESSION_DETAILS = {
+            API_KEY: "45167552",
+            SESSION_ID: "2_MX40NTE2NzU1Mn5-MTQyNTQ3MDE1NzU5NH5KMnp1MElVeFNTK0FoZHY5QkRPVFdSeit-fg",
+            TOKEN: "",
+            RECORD_ID: null
+        };
+
+        function callService(type, url, reqData, callBack) {
+                $.ajax({
+                    type: type,
+                    url: url,
+                    data: reqData,
+                    success: function(data) {
+                        callBack(data);
+                    },
+                    error: function(error) {
+                        console.log("Got error for :" + url);
+                    }
+                });
+            }
+        // Get a seesion id
+        callService("GET", "/ots/generate_session_id", {
+            "session_name": "New Test Session"
+        }, function(sessionData) {
+            //SESSION_DETAILS.SESSION_ID = "sessionData.session_id";
+            callService("GET", "/ots/generate_token", {
+                "ost_session_id": SESSION_DETAILS.SESSION_ID,
+                "role": "moderator"
+            }, function(tokenData) {
+                SESSION_DETAILS.TOKEN = tokenData.token_id;
+                initSession();
+            });
+        });
+
+        function initSession() {
+            OT.setLogLevel(OT.DEBUG);
+            if (OT.checkSystemRequirements() != OT.HAS_REQUIREMENTS) {
+                alert('Minimum System Requirements not met!');
+            }
+            var session = OT.initSession(SESSION_DETAILS.SESSION_ID);
+            session.addEventListener('sessionConnected', sessionConnectedHandler);
+            session.addEventListener('streamCreated', streamCreatedHandler);
+            session.addEventListener('archiveStarted', archiveStartedHandler);
+            //session.addEventListener('archiveStopped', archiveStoppedHandler);
+
+            session.connect(SESSION_DETAILS.API_KEY, SESSION_DETAILS.TOKEN);
+            var publisher;
+
+            function archiveStartedHandler(event) {
+                alert("")
+            }
+            function sessionConnectedHandler(event) {
+                publisher = OT.initPublisher(SESSION_DETAILS.API_KEY, 'myPublisherDiv', {
+                    width: 575,
+                    height: 475,
+                    name: "Santosh"
+                }, {
+                    wmode: 'window'
+                });
+                session.publish(publisher);
+                // Subscribe to streams that were in the session when we connected
+                subscribeToStreams(event.streams);
+            }
+
+            function streamCreatedHandler(event) {
+                // Subscribe to any new streams that are created
+                subscribeToStreams(event.streams);
+            }
+
+            function subscribeToStreams(streams) {
+                for (var i = 0; i < streams.length; i++) {
+                    // Check that connectionId on the stream to make sure we don't subscribe to ourself
+                    if (streams[i].connection.connectionId == session.connection.connectionId) {
+                        return;
+                    }
+                    // Create the div to put the subscriber element in to
+                    $("#subscribers").append("<div id=stream" + streams[i].streamId + " style=width:145px;height:120px;float:left;margin-left:10px;></div>")
+                        // Subscribe to the stream
+                    session.subscribe(streams[i], "stream" + streams[i].streamId, {
+                        width: 143,
+                        height: 118
+                    });
+                }
+            }
+            $("#record-session").click(function() {
+                callService("GET", "/ots/record_session", {
+                    "ost_session_id": SESSION_DETAILS.SESSION_ID,
+                    "name": "Demo session recording"
+                }, function(reocrdData) {
+                    SESSION_DETAILS.RECORD_ID = reocrdData.id
+                });
+            });
+        }
+
+    });
+</script>
+</head>
+
+<div id="subscribers"></div>
+<div id="myPublisherDiv" style="width: 575px; height: 475px; top: 145px;left: -145px;"></div>
+<button id="record-session" style="float: right">Start Recording</button>

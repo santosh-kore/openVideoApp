@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  ost_session_id: MyText
+  name: MyText
+  description: MyText
+
+two:
+  ost_session_id: MyText
+  name: MyText
+  description: MyText
