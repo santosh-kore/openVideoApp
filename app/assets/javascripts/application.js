@@ -13,4 +13,9 @@
 //= require jquery
 //= require jquery_ujs
 //= require opentok.min
+//= require bootstrap.min.js
+//= require fastclick.min.js
+//= require jquery.slimscroll.min
+//= require moment.min
+//= require app
 //= require_tree .

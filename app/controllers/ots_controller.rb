@@ -14,7 +14,7 @@ class OtsController < ApplicationController
       params[:ost_session_id], {
         :role        => params[:role].to_sym,
         :expire_time => Time.now.to_i + (7 * 24 * 60 * 60),
-        :data        => "name=Santosh"
+        :data        => params[:data]
       }
     );
     tokenData = {token_id: token}
@@ -27,6 +27,10 @@ class OtsController < ApplicationController
 
   def subscriber
   	render :layout => "application"
+  end
+
+  def video_call
+    render :layout => "application"
   end
 
   def record_session

@@ -21,18 +21,19 @@
                 });
             }
         // Get a seesion id
-        callService("GET", "/ots/generate_session_id", {
+        /*callService("GET", "/ots/generate_session_id", {
             "session_name": "New Test Session"
-        }, function(sessionData) {
+        }, function(sessionData) {*/
             //SESSION_DETAILS.SESSION_ID = "sessionData.session_id";
             callService("GET", "/ots/generate_token", {
                 "ost_session_id": SESSION_DETAILS.SESSION_ID,
-                "role": "moderator"
+                "role": "moderator",
+                "data": "{name: Santosh}"
             }, function(tokenData) {
                 SESSION_DETAILS.TOKEN = tokenData.token_id;
                 initSession();
             });
-        });
+        //});
 
         function initSession() {
             OT.setLogLevel(OT.DEBUG);
@@ -43,7 +44,25 @@
             session.addEventListener('sessionConnected', sessionConnectedHandler);
             session.addEventListener('streamCreated', streamCreatedHandler);
             session.addEventListener('archiveStarted', archiveStartedHandler);
+            session.on("signal", function(event) {
+                $("#receivedMessages").text(event.from.id + " says: " + event.data);
+            });
             //session.addEventListener('archiveStopped', archiveStoppedHandler);
+            //Send text message
+            $("#sendMessage").on("keyup", function(event) {
+                if(event.which === 13 || event.keyCode === 13) {
+                    session.signal({
+                        data: "hello"
+                    },
+                    function(error) {
+                        if (error) {
+                            console.log("signal error (" + error.code + "): " + error.message);
+                        } else {
+                            console.log("signal sent.");
+                        }
+                    });
+                }
+            });
 
             session.connect(SESSION_DETAILS.API_KEY, SESSION_DETAILS.TOKEN);
             var publisher;
@@ -70,6 +89,7 @@
             }
 
             function subscribeToStreams(streams) {
+                debugger
                 for (var i = 0; i < streams.length; i++) {
                     // Check that connectionId on the stream to make sure we don't subscribe to ourself
                     if (streams[i].connection.connectionId == session.connection.connectionId) {
@@ -100,4 +120,6 @@
 
 <div id="subscribers"></div>
 <div id="myPublisherDiv" style="width: 575px; height: 475px; top: 145px;left: -145px;"></div>
+<input type="text" id="sendMessage" placeholder="Enter message here" style="float: right">
+<textarea id="receivedMessages" style="float: right"></textarea>
 <button id="record-session" style="float: right">Start Recording</button>

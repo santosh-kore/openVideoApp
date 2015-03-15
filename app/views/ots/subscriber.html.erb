@@ -7,6 +7,8 @@
             TOKEN: "",
             RECORD_ID: null
         };
+        
+
 
         function callService(type, url, reqData, callBack) {
             $.ajax({
@@ -22,18 +24,19 @@
             });
         }
         // Get a seesion id
-        callService("GET", "/ots/generate_session_id", {
+       /* callService("GET", "/ots/generate_session_id", {
             "session_name": "New Test Session"
-        }, function(sessionData) {
+        }, function(sessionData) {*/
             //SESSION_DETAILS.SESSION_ID = "sessionData.session_id";
             callService("GET", "/ots/generate_token", {
                 "ost_session_id": SESSION_DETAILS.SESSION_ID,
-                "role": "publisher"
+                "role": "publisher",
+                "data": "{name: Santosh}"
             }, function(tokenData) {
                 SESSION_DETAILS.TOKEN = tokenData.token_id;
                 initSession();
             });
-        });
+        //});
 
         function initSession() {
             OT.setLogLevel(OT.DEBUG);
@@ -43,7 +46,25 @@
             session.addEventListener('streamCreated', streamCreatedHandler);
             session.connect(SESSION_DETAILS.API_KEY, SESSION_DETAILS.TOKEN);
             session.addEventListener('archiveStarted', archiveStartedHandler);
+            session.on("signal", function(event) {
+                $("#receivedMessages").text(event.from.id + " says: " + event.data);
+            });
             //session.addEventListener('archiveStopped', archiveStoppedHandler);
+            //Send text message
+            $("#sendMessage").on("keyup", function(event) {
+                if(event.which === 13 || event.keyCode === 13) {
+                    session.signal({
+                        data: "hello"
+                    },
+                    function(error) {
+                        if (error) {
+                            console.log("signal error (" + error.code + "): " + error.message);
+                        } else {
+                            console.log("signal sent.");
+                        }
+                    });
+                }
+            });
             function archiveStartedHandler(event) {
                 alert("")
             }
@@ -52,7 +73,8 @@
             function sessionConnectedHandler(event) {
                 publisher = session.publish('myPublisherDiv', {
                     width: 575,
-                    height: 475
+                    height: 475,
+                    name: "Santosh"
                 }, {
                     wmode: 'window'
                 });
@@ -96,4 +118,6 @@
 </script>
  <div id="subscribers"></div>
  <div id="myPublisherDiv" style="width: 575px; height: 475px; top: 145px;left: -145px;"></div>
+ <input type="text" id="sendMessage" style="float: right">
+ <textarea id="receivedMessages" style="float: right"></textarea>
  <button id="record-session" style="float: right">Start Recording</button>
