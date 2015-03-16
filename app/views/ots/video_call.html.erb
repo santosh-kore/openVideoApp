@@ -29,7 +29,7 @@
             callService("GET", "/ots/generate_token", {
                 "ost_session_id": SESSION_DETAILS.SESSION_ID,
                 "role": "moderator",
-                "data": '{"name":"Josha"}'
+                "data": '{"name":"Santosh"}'
             }, function(tokenData) {
                 SESSION_DETAILS.TOKEN = tokenData.token_id;
                 initSession();
@@ -107,7 +107,7 @@
                 publisher = OT.initPublisher(SESSION_DETAILS.API_KEY, 'large-video-container', {
                     width: 626,
                     height: 352,
-                    name: "Josha"
+                    name: "Santosh"
                 }, {
                     wmode: 'window'
                 });

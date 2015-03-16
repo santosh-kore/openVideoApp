@@ -33,6 +33,10 @@ class OtsController < ApplicationController
     render :layout => "application"
   end
 
+  def login
+    render :layout => "login_layout"
+  end
+
   def record_session
     archive = @opentok.archives.create params[:ost_session_id]
     render :json => archive

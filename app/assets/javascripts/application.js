@@ -17,5 +17,6 @@
 //= require fastclick.min.js
 //= require jquery.slimscroll.min
 //= require moment.min
+//= require icheck.min.js
 //= require app
 //= require_tree .

@@ -5,6 +5,7 @@ OstApp::Application.routes.draw do
   get "ots/subscriber"
   get "ots/record_session"
   get "ots/video_call"
+  get "ots/login"
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
